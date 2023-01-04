@@ -2,7 +2,7 @@
 .idea
 
 coverage
-lib
+# lib
 mochawesome-report
 node_modules
-types
+# types
