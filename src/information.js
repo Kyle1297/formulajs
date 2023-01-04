@@ -99,7 +99,12 @@ export function ISERR(value) {
  * @returns
  */
 export function ISERROR(value) {
-  return ISERR(value) || value === na || value?.message === errors?.value?.message || value?.message === errors?.calc?.message
+  return (
+    ISERR(value) ||
+    value === error.na ||
+    value?.message === error.value.message ||
+    value?.message === error.calc.message
+  )
 }
 
 /**

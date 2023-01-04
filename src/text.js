@@ -1,6 +1,7 @@
 import * as error from './utils/error.js'
 import * as utils from './utils/common.js'
 import { ROUND } from './math-trig.js'
+import { Decimal } from 'decimal.js'
 
 // TODO
 /**
@@ -679,20 +680,20 @@ export function T(value) {
 }
 
 function handleTextNumbers(value, format_text) {
-  let result = ""
-  const integers = value.toString().split(".")[0] || ""
-  const decimals = value.toString().split(".")[1] || ""
+  let result = ''
+  const integers = value.toString().split('.')[0] || ''
+  const decimals = value.toString().split('.')[1] || ''
   let currentValueIndex = 0
   let currentIntegerIndex = 0
   let currentDecimalIndex = 0
   let isInteger = true
 
-  const numberOfHashesAndZerosBeforeDecimal = format_text.split(".")[0].match(/[0|#]/g)?.length || 0
-  const numberOfHashesAndZerosAfterDecimal = format_text.split(".")?.[1]?.match(/[0|#]/g)?.length || 0
+  const numberOfHashesAndZerosBeforeDecimal = format_text.split('.')[0].match(/[0|#]/g)?.length || 0
+  const numberOfHashesAndZerosAfterDecimal = format_text.split('.')?.[1]?.match(/[0|#]/g)?.length || 0
   const endOfDecimalIndex = Math.min(decimals.length, numberOfHashesAndZerosAfterDecimal) - 1
 
   for (let i = 0; i < format_text.length; i++) {
-    if (format_text[i] === "#" || format_text[i] === "0") {
+    if (format_text[i] === '#' || format_text[i] === '0') {
       // integer portion of the number
       if (isInteger && currentIntegerIndex < integers.length) {
         // even if the number of hashes and zeros is less than the number of integers, we still need to show all the integers
@@ -702,8 +703,7 @@ function handleTextNumbers(value, format_text) {
 
           if (shouldRound) {
             result += Math.round(value).toString().substring(0, addToIndexes)
-          }
-          else {
+          } else {
             result += integers.substring(0, addToIndexes)
           }
 
@@ -715,8 +715,7 @@ function handleTextNumbers(value, format_text) {
           const shouldRound = currentIntegerIndex === integers.length - 1 && !numberOfHashesAndZerosAfterDecimal
           if (shouldRound) {
             result += Math.round(value).toString().substr(-1)
-          }
-          else {
+          } else {
             result += value.toString()[currentValueIndex]
           }
 
@@ -728,7 +727,10 @@ function handleTextNumbers(value, format_text) {
       else if (!isInteger && currentDecimalIndex < endOfDecimalIndex + 1) {
         const shouldRound = currentDecimalIndex === endOfDecimalIndex
         if (shouldRound) {
-          result += value.toFixed(currentDecimalIndex + 1).toString().substr(-1)
+          result += value
+            .toFixed(currentDecimalIndex + 1)
+            .toString()
+            .substr(-1)
         } else {
           result += value.toString()[currentValueIndex]
         }
@@ -738,14 +740,14 @@ function handleTextNumbers(value, format_text) {
       }
     }
     // decimal point
-    else if (format_text[i] === ".") {
+    else if (format_text[i] === '.') {
       isInteger = false
       if (currentIntegerIndex <= integers.length) {
         result += integers.substring(currentIntegerIndex)
         currentValueIndex = integers.length + 1
         currentIntegerIndex = integers.length
       }
-      result += "."
+      result += '.'
     }
 
     // other random characters, e.g. xx, $, etc.
@@ -754,7 +756,7 @@ function handleTextNumbers(value, format_text) {
     }
   }
 
-  return result;
+  return result
 }
 
 /**
@@ -778,49 +780,48 @@ function handleTextNumbers(value, format_text) {
  */
 export function TEXT(value, format_text) {
   if (value === undefined || format_text === undefined) {
-    return error.na;
+    return error.na
   }
 
-  value = utils.parseNumber(value);
+  value = utils.parseNumber(value)
   if (utils.anyIsError(value)) {
     return error.value
   }
 
-  format_text = utils.parseString(format_text);
-  if (utils.anyIsError("FORMAT: ", format_text)) {
-    return error.value;
+  format_text = utils.parseString(format_text)
+  if (utils.anyIsError('FORMAT: ', format_text)) {
+    return error.value
   }
 
-  let result = "";
-  if (format_text === "") {
+  let result = ''
+  if (format_text === '') {
     result = format_text
-  }
-  else if (
+  } else if (
     // format_text.includes("#,") ||
     // format_text.includes("0,") ||
-    format_text.includes("h") ||
-    format_text.includes("m") ||
-    format_text.includes("s") ||
-    format_text.includes("d") ||
-    format_text.includes("y") ||
-    format_text.includes("A/P") ||
-    format_text.includes("AM/PM") ||
-    format_text.includes("?/") ||
-    format_text.includes("/?") ||
-    format_text.includes("E+") ||
-    format_text.includes("E-") ||
-    format_text.includes("e+") ||
-    format_text.includes("e-") ||
-    format_text.includes("*") ||
-    format_text.includes("_") ||
-    format_text.includes(";") ||
-    format_text.includes("[") ||
-    format_text.includes("]")
+    format_text.includes('h') ||
+    format_text.includes('m') ||
+    format_text.includes('s') ||
+    format_text.includes('d') ||
+    format_text.includes('y') ||
+    format_text.includes('A/P') ||
+    format_text.includes('AM/PM') ||
+    format_text.includes('?/') ||
+    format_text.includes('/?') ||
+    format_text.includes('E+') ||
+    format_text.includes('E-') ||
+    format_text.includes('e+') ||
+    format_text.includes('e-') ||
+    format_text.includes('*') ||
+    format_text.includes('_') ||
+    format_text.includes(';') ||
+    format_text.includes('[') ||
+    format_text.includes(']')
   ) {
-    throw new Error("TEXT formula not implemented")
+    throw new Error('TEXT formula not implemented')
   }
   // percentage
-  else if (format_text.includes("%")) {
+  else if (format_text.includes('%')) {
     if (format_text.length === 1) {
       return format_text
     }
@@ -828,11 +829,10 @@ export function TEXT(value, format_text) {
     result = handleTextNumbers(percentage, format_text)
   }
   // general
-  else if (format_text.includes("#") || format_text.includes("0")) {
+  else if (format_text.includes('#') || format_text.includes('0')) {
     result = handleTextNumbers(new Decimal(value).toNumber(), format_text)
-  }
-  else {
-    throw new Error("TEXT formula not implemented")
+  } else {
+    throw new Error('TEXT formula not implemented')
   }
 
   return result

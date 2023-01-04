@@ -416,9 +416,9 @@ export function SORT(array, sort_index, sort_order, by_col) {
   const arrayWidth = array[0].length
   const arrayHeight = array.length
 
-   // by_col
-   if (by_col == null) {
-    by_col = "FALSE"
+  // by_col
+  if (by_col == null) {
+    by_col = 'FALSE'
   }
 
   const byCol = utils.parseBool(by_col)
